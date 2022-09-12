@@ -1,8 +1,8 @@
 package protocol
 
 import (
-	"github.com/v2rayA/shadowsocksR/ssr"
-	"github.com/v2rayA/shadowsocksR/tools"
+	"github.com/sagernet/shadowsocksr/ssr"
+	"github.com/sagernet/shadowsocksr/tools"
 	"strings"
 )
 

@@ -8,8 +8,8 @@ import (
 	"crypto/rc4"
 	"encoding/binary"
 	"errors"
-	"github.com/v2rayA/shadowsocksR/tools"
-	"github.com/v2rayA/shadowsocksR/tools/leakybuf"
+	"github.com/sagernet/shadowsocksr/tools"
+	"github.com/sagernet/shadowsocksr/tools/leakybuf"
 	"math/rand"
 
 	"golang.org/x/crypto/blowfish"

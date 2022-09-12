@@ -3,7 +3,7 @@ package protocol
 import (
 	"bytes"
 
-	"github.com/v2rayA/shadowsocksR/tools"
+	"github.com/sagernet/shadowsocksr/tools"
 )
 
 func init() {

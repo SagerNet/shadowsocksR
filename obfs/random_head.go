@@ -1,7 +1,7 @@
 package obfs
 
 import (
-	"github.com/v2rayA/shadowsocksR/ssr"
+	"github.com/sagernet/shadowsocksr/ssr"
 	"math/rand"
 )
 
