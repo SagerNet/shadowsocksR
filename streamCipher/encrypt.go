@@ -12,10 +12,6 @@ import (
 	"github.com/v2rayA/shadowsocksR/tools/leakybuf"
 	"math/rand"
 
-	"github.com/dgryski/go-camellia"
-	"github.com/dgryski/go-idea"
-	"github.com/dgryski/go-rc2"
-	chacha20 "gitlab.com/yawning/chacha20.git"
 	"golang.org/x/crypto/blowfish"
 	"golang.org/x/crypto/cast5"
 	"golang.org/x/crypto/salsa20/salsa"
@@ -94,14 +90,6 @@ func newRC4MD5Stream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
 	return rc4.NewCipher(rc4key)
 }
 
-func newChaCha20Stream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
-	return chacha20.New(key, iv)
-}
-
-func newChacha20IETFStream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
-	return chacha20.New(key, iv)
-}
-
 type salsaStreamCipher struct {
 	nonce   [8]byte
 	key     [32]byte
@@ -142,36 +130,15 @@ func newSalsa20Stream(key, iv []byte, _ DecOrEnc) (cipher.Stream, error) {
 	return &c, nil
 }
 
-func newCamelliaStream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
-	block, err := camellia.New(key)
-	return newCFBStream(block, err, key, iv, doe)
-}
-
-func newIdeaStream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
-	block, err := idea.NewCipher(key)
-	return newCFBStream(block, err, key, iv, doe)
-}
-
-func newRC2Stream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
-	block, err := rc2.New(key, 16)
-	return newCFBStream(block, err, key, iv, doe)
-}
-
 func newRC4Stream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
 	return rc4.NewCipher(key)
-}
-
-func newSeedStream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
-	// TODO: SEED block cipher implementation is required
-	block, err := rc2.New(key, 16)
-	return newCFBStream(block, err, key, iv, doe)
 }
 
 type NoneStream struct {
 	cipher.Stream
 }
 
-func (*NoneStream) XORKeyStream(dst, src []byte) () {
+func (*NoneStream) XORKeyStream(dst, src []byte) {
 	copy(dst, src)
 }
 
@@ -186,31 +153,23 @@ type cipherInfo struct {
 }
 
 var streamCipherMethod = map[string]*cipherInfo{
-	"aes-128-cfb":      {16, 16, newAESCFBStream},
-	"aes-192-cfb":      {24, 16, newAESCFBStream},
-	"aes-256-cfb":      {32, 16, newAESCFBStream},
-	"aes-128-ctr":      {16, 16, newAESCTRStream},
-	"aes-192-ctr":      {24, 16, newAESCTRStream},
-	"aes-256-ctr":      {32, 16, newAESCTRStream},
-	"aes-128-ofb":      {16, 16, newAESOFBStream},
-	"aes-192-ofb":      {24, 16, newAESOFBStream},
-	"aes-256-ofb":      {32, 16, newAESOFBStream},
-	"des-cfb":          {8, 8, newDESStream},
-	"bf-cfb":           {16, 8, newBlowFishStream},
-	"cast5-cfb":        {16, 8, newCast5Stream},
-	"rc4-md5":          {16, 16, newRC4MD5Stream},
-	"rc4-md5-6":        {16, 6, newRC4MD5Stream},
-	"chacha20":         {32, 8, newChaCha20Stream},
-	"chacha20-ietf":    {32, 12, newChacha20IETFStream},
-	"salsa20":          {32, 8, newSalsa20Stream},
-	"camellia-128-cfb": {16, 16, newCamelliaStream},
-	"camellia-192-cfb": {24, 16, newCamelliaStream},
-	"camellia-256-cfb": {32, 16, newCamelliaStream},
-	"idea-cfb":         {16, 8, newIdeaStream},
-	"rc2-cfb":          {16, 8, newRC2Stream},
-	"seed-cfb":         {16, 8, newSeedStream},
-	"rc4":              {16, 0, newRC4Stream},
-	"none":             {16, 0, newNoneStream},
+	"aes-128-cfb": {16, 16, newAESCFBStream},
+	"aes-192-cfb": {24, 16, newAESCFBStream},
+	"aes-256-cfb": {32, 16, newAESCFBStream},
+	"aes-128-ctr": {16, 16, newAESCTRStream},
+	"aes-192-ctr": {24, 16, newAESCTRStream},
+	"aes-256-ctr": {32, 16, newAESCTRStream},
+	"aes-128-ofb": {16, 16, newAESOFBStream},
+	"aes-192-ofb": {24, 16, newAESOFBStream},
+	"aes-256-ofb": {32, 16, newAESOFBStream},
+	"des-cfb":     {8, 8, newDESStream},
+	"bf-cfb":      {16, 8, newBlowFishStream},
+	"cast5-cfb":   {16, 8, newCast5Stream},
+	"rc4-md5":     {16, 16, newRC4MD5Stream},
+	"rc4-md5-6":   {16, 6, newRC4MD5Stream},
+	"salsa20":     {32, 8, newSalsa20Stream},
+	"rc4":         {16, 0, newRC4Stream},
+	"none":        {16, 0, newNoneStream},
 }
 
 func CheckCipherMethod(method string) error {
